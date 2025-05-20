@@ -56,29 +56,24 @@ class Portfolio():
         self.optimized = False
         
 
-    def get_data(self, period = '5m'):
+    def get_data(self, period = '5y'):
         """
         Get the data of the portfolio
         period : str
         """
-        self.close = yf.download(self.tickers, period = period, auto_adjust=False)['Close']
-        self.adj_close = yf.download(self.tickers, period = period, auto_adjust=False)['Adj Close']
+        self.close = yf.download(self.tickers, period = period)['Close']
+        
         
     def clean_data(self):
         """
         Clean the data of the portfolio
         """
-        if not (self.close and self.adj_close):
+        if not all(self.close):
             self.get_data()
             
         self.close.interpolate(limit = 5, inplace = True)
-        self.adj_close.interpolate(limit = 5, inplace = True)
-        
         self.close.ffill(inplace = True)
-        self.adj_close.ffill(inplace = True)
-        
-        self.data = self.adj_close
-        
+        self.data = self.close
         print('Data cleaned successfully.')
         
     def calculate_return(self):
